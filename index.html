@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
@@ -31,4 +31,80 @@ function makePrompt(){const idea=clean($('idea').value);if(!idea){$('idea').focu
 $('generate').onclick=makePrompt;
 $('copy').onclick=async()=>{const text=$('output').textContent;if(!text||text.startsWith('Enter an idea'))return;try{await navigator.clipboard.writeText(text);$('copy').textContent='✓ Copied';setTimeout(()=>$('copy').textContent='📋 Copy Prompt',1500)}catch(e){alert('Copy failed. Long-press the prompt to copy it.')}};
 $('clear').onclick=()=>{$('idea').value='';$('count').textContent='0';$('character').value='';$('dialogue').value='';$('output').textContent='Enter an idea and tap “Generate Prompt”.';$('timeline').innerHTML='<div class="small">Your scene breakdown will appear here.</div>'};
+</script></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PromptForge V3 — AI Video Prompt Studio</title>
+<style>
+:root{--bg:#0b1020;--card:#121a2e;--card2:#18233b;--text:#f5f7ff;--muted:#9da9c7;--accent:#7c5cff;--accent2:#20d4a5;--line:#293653;--danger:#ff6b7a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer;border:0}.app{max-width:1100px;margin:auto;padding:22px}.hero{padding:10px 0 20px}.badge{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:999px;color:#b9c3ff;font-size:12px}.hero h1{font-size:clamp(28px,6vw,46px);margin:12px 0 8px}.hero p{color:var(--muted);margin:0}.grid{display:grid;grid-template-columns:360px 1fr;gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}.card h2{font-size:18px;margin:0 0 14px}.field{margin:0 0 14px}.field label{display:block;font-size:13px;color:#cbd3e9;margin-bottom:7px}.field input,.field textarea,.field select{width:100%;background:#0d1528;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:11px;outline:none}.field textarea{min-height:150px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.checks{display:grid;gap:8px}.check{display:flex;gap:8px;align-items:center;color:#cbd3e9;font-size:13px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.btn{padding:11px 14px;border-radius:11px;background:var(--card2);color:var(--text);border:1px solid var(--line)}.primary{background:var(--accent);border-color:var(--accent);font-weight:700}.green{background:var(--accent2);color:#06130f;border-color:var(--accent2);font-weight:700}.danger{color:#ffd2d8}.small{font-size:12px;color:var(--muted)}.scene{border:1px solid var(--line);background:#0e172b;border-radius:16px;padding:16px;margin-bottom:12px}.sceneHead{display:flex;justify-content:space-between;gap:10px;align-items:center}.sceneHead h3{margin:0;font-size:17px}.pill{font-size:11px;color:#c9d0ff;border:1px solid var(--line);border-radius:999px;padding:5px 8px}.scene textarea{min-height:260px;margin-top:12px}.copyScene{margin-top:8px}.empty{padding:35px 15px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px}.characterBox{background:#0d1528;border:1px solid var(--line);padding:12px;border-radius:12px;color:#cbd3e9;font-size:13px;line-height:1.5;white-space:pre-wrap}.footer{padding:18px 0;color:var(--muted);font-size:12px;text-align:center}@media(max-width:800px){.grid{grid-template-columns:1fr}.app{padding:14px}.row{grid-template-columns:1fr}}
+</style></head>
+<body><main class="app">
+<section class="hero"><span class="badge">PROMPTFORGE V3</span><h1>Story → Connected AI Video Prompts</h1><p>Turn one story idea into multiple connected scenes, each designed for up to 20 seconds.</p></section>
+<div class="grid">
+<section class="card">
+<h2>Story setup</h2>
+<div class="field"><label>Story / idea</label><textarea id="story" placeholder="Example: A poor African boy discovers a mysterious glowing stone in a forest and follows its light to an ancient hidden city."></textarea></div>
+<div class="row"><div class="field"><label>Scenes</label><select id="sceneCount"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>8</option><option>10</option></select></div><div class="field"><label>Seconds / scene</label><select id="duration"><option>5</option><option>10</option><option>15</option><option selected>20</option></select></div></div>
+<div class="row"><div class="field"><label>Visual style</label><select id="style"><option>Cinematic realistic</option><option>Hollywood fantasy</option><option>African cinematic drama</option><option>Epic biblical</option><option>Anime</option><option>3D animation</option><option>Documentary</option></select></div><div class="field"><label>Aspect ratio</label><select id="ratio"><option>16:9</option><option>9:16</option><option>1:1</option></select></div></div>
+<div class="field"><label>Character / continuity description (optional)</label><textarea id="character" style="min-height:95px" placeholder="Example: 12-year-old African boy, slim build, short black hair, blue faded shirt, brown shorts, worn sandals. Keep identical in every scene."></textarea></div>
+<div class="checks"><label class="check"><input id="dialogue" type="checkbox" checked> Include dialogue / voice guidance</label><label class="check"><input id="sound" type="checkbox" checked> Include sound design</label><label class="check"><input id="negative" type="checkbox" checked> Include negative prompt</label></div>
+<div class="actions"><button class="btn primary" id="generate">Generate Story</button><button class="btn" id="clear">Clear</button></div>
+</section>
+<section class="card"><div class="sceneHead"><h2>Generated scenes</h2><div class="actions" style="margin:0"><button class="btn green" id="copyAll">Copy All</button></div></div><div id="characterOut" style="display:none;margin:10px 0 14px"><div class="small">CONTINUITY LOCK</div><div class="characterBox" id="characterText"></div></div><div id="scenes"><div class="empty">Enter a story idea and tap <b>Generate Story</b>.</div></div></section>
+</div><div class="footer">PromptForge generates structured prompts locally. It does not call a video-generation API.</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+function clean(s){return s.trim().replace(/\s+/g,' ')}
+function inferCharacter(story){const m=story.match(/(?:a|an|the)\s+([^,.!?]{5,100})(?:\s+(?:discovers|finds|sees|walks|runs|enters|meets|is|goes|travels))/i);return m?`Main subject inferred from story: ${m[1]}. Preserve the same age, face, body proportions, hairstyle, clothing, colors and accessories across every scene.`:'Keep every recurring character visually identical across scenes: same face, age, body proportions, hairstyle, clothing, colors and accessories.'}
+function buildScene(story,n,total,dur,style,ratio,char,dialogue,sound,negative){
+ const beats=dur==20?`0–5s: establish the location and character; 5–10s: begin the main action; 10–15s: intensify the action or reveal; 15–20s: deliver a clear visual payoff and transition-ready ending.`:dur==15?`0–5s: establish; 5–10s: main action; 10–15s: reveal/payoff.`:dur==10?`0–4s: establish; 4–7s: action; 7–10s: payoff.`:`0–2s: establish; 2–4s: action; 4–5s: payoff.`;
+ const arc=[`Opening / setup`,`Inciting action`,`Rising action`,`Turning point`,`Climax`,`Resolution`,`Aftermath`,`Final reveal`][(n-1)%8];
+ const camera=['wide establishing shot, slow cinematic push-in','medium tracking shot following the subject','low-angle dolly movement that builds scale','handheld close-up with controlled cinematic motion','over-the-shoulder shot revealing the discovery','slow orbit around the subject as the moment peaks','aerial-to-ground transition ending on the subject','close-up reaction followed by a gentle pull-back'][n-1%8];
+ const action=n===1?`Open naturally from the story premise: ${story}`:`Continue directly from the previous scene. Advance the story rather than restarting it. Scene ${n} should represent the ${arc.toLowerCase()} of the narrative.`;
+ return `SCENE ${n} OF ${total} — ${dur} SECONDS
+TITLE: ${arc}
+
+CORE ACTION
+${action}
+
+CHARACTER CONTINUITY
+${char}
+
+TIMELINE
+${beats}
+
+VISUAL STYLE
+${style}. ${ratio} composition. Photorealistic detail where appropriate, coherent geography, natural motion, physically believable lighting, consistent wardrobe and props.
+
+CAMERA
+${camera}. Smooth purposeful camera movement; keep the main subject readable and avoid random cuts.
+
+ENVIRONMENT & LIGHTING
+Build the location implied by the story with detailed textures, atmospheric depth, motivated light, realistic shadows and cinematic contrast. Maintain continuity with previous scenes.
+
+PERFORMANCE & MOTION
+Natural facial expressions, body movement and interaction with the environment. Every action must progress logically from the preceding moment and finish in a state that can connect to the next scene.${dialogue?'
+
+DIALOGUE / VOICE
+Use concise natural dialogue only when it advances the story. Keep lip movement synchronized. If no dialogue is needed, use expressive reactions and environmental sound instead.':''}${sound?'
+
+SOUND DESIGN
+Layer location ambience, footsteps and relevant environmental effects. Add restrained cinematic music that supports the emotional beat without overpowering dialogue.':''}
+
+CONTINUITY NOTE
+This is part of one continuous film. Do not change the character identity, clothing, props, location geography, time-of-day logic or visual style without a story reason. Match the final frame to the next scene.
+${negative?'
+NEGATIVE PROMPT
+No character identity drift, no wardrobe changes without cause, no extra fingers or limbs, no distorted faces, no warped objects, no unreadable text, no random camera jumps, no flicker, no inconsistent lighting, no sudden location changes, no low-detail faces, no unnatural motion.':''}`;
+}
+function generate(){const story=clean($('story').value);if(!story){$('story').focus();alert('Enter a story or video idea first.');return}const total=+$('sceneCount').value,dur=+$('duration').value,style=$('style').value,ratio=$('ratio').value;let char=clean($('character').value)||inferCharacter(story);$('characterOut').style.display='block';$('characterText').textContent=char;let out='';for(let i=1;i<=total;i++){const prompt=buildScene(story,i,total,dur,style,ratio,char,$('dialogue').checked,$('sound').checked,$('negative').checked);out+=`<article class="scene"><div class="sceneHead"><h3>Scene ${i}</h3><span class="pill">${dur}s • ${ratio}</span></div><textarea readonly>${prompt}</textarea><button class="btn copyScene" data-index="${i}">Copy Scene ${i}</button></article>`}$('scenes').innerHTML=out;document.querySelectorAll('.copyScene').forEach(b=>b.onclick=()=>navigator.clipboard.writeText(b.parentElement.querySelector('textarea').value).then(()=>{b.textContent='Copied ✓';setTimeout(()=>b.textContent='Copy Scene '+b.dataset.index,1200)}));}
+$('generate').onclick=generate;$('clear').onclick=()=>{['story','character'].forEach(x=>$(x).value='');$('characterOut').style.display='none';$('scenes').innerHTML='<div class="empty">Enter a story idea and tap <b>Generate Story</b>.</div>'};$('copyAll').onclick=()=>{const ts=[...document.querySelectorAll('.scene textarea')];if(!ts.length)return; navigator.clipboard.writeText(ts.map(x=>x.value).join('
+
+==============================
+
+')).then(()=>alert('All scene prompts copied.'))};
 </script></body></html>
