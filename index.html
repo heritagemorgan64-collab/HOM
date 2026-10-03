@@ -1,110 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PromptForge V4</title>
+<style>
+:root{
+  --bg:#090b12;--panel:#111521;--panel2:#171c2b;--text:#f4f7ff;--muted:#9ca8c1;
+  --accent:#7c5cff;--accent2:#00d4ff;--border:#293148;--good:#35d07f;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial,sans-serif}
+.app{max-width:900px;margin:auto;padding:22px 16px 50px}
+header{padding:8px 2px 22px}
+h1{margin:0;font-size:30px;letter-spacing:-1px}
+.subtitle{color:var(--muted);margin-top:6px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:18px;padding:18px;margin-top:14px}
+label{display:block;font-weight:700;margin-bottom:8px}
+textarea,input,select{width:100%;background:var(--panel2);border:1px solid var(--border);border-radius:12px;color:var(--text);padding:13px;font:inherit;outline:none}
+textarea{min-height:150px;resize:vertical}
+textarea:focus,input:focus,select:focus{border-color:var(--accent)}
+.counter{text-align:right;color:var(--muted);font-size:12px;margin-top:5px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.duration{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.duration button,.action{border:1px solid var(--border);background:var(--panel2);color:var(--text);border-radius:11px;padding:12px;font-weight:700;cursor:pointer}
+.duration button.active{background:var(--accent);border-color:var(--accent)}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
+.action.primary{background:var(--accent);border-color:var(--accent)}
+.action.secondary{background:transparent}
+.action:active{transform:scale(.98)}
+.status{color:var(--good);font-size:13px;margin-top:10px;min-height:18px}
+.timeline{display:grid;gap:10px}
+.scene{background:var(--panel2);border:1px solid var(--border);border-radius:14px;padding:14px}
+.scene-head{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.badge{font-size:12px;color:#dce2ff;background:#222941;padding:5px 8px;border-radius:999px}
+.scene p{line-height:1.55;margin:10px 0 0;color:#e9edfa}
+.prompt{white-space:pre-wrap;line-height:1.55;font-size:14px;background:#0c101a;border:1px solid var(--border);border-radius:13px;padding:15px;max-height:700px;overflow:auto}
+.small{font-size:13px;color:var(--muted);line-height:1.5}
+@media(max-width:650px){.grid{grid-template-columns:1fr}.duration{grid-template-columns:repeat(2,1fr)}h1{font-size:26px}}
+</style>
+</head>
+<body>
+<main class="app">
+<header>
+  <h1>PROMPTFORGE V4</h1>
+  <div class="subtitle">Text → detailed cinematic video prompt with story-driven timed action</div>
+</header>
 
-<html lang="en">
-<head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>PromptForge — 20s Video Prompt Generator</title>
-<style>
-:root{color-scheme:dark;--bg:#080b14;--panel:#101625;--panel2:#151c2e;--line:#29334b;--text:#f5f7ff;--muted:#9ca8c2;--accent:#7c5cff;--accent2:#20d9a3;--danger:#ff6b7a}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif}.app{min-height:100vh;padding:20px;max-width:1050px;margin:auto}.hero{padding:18px 0 10px}.badge{display:inline-block;background:#211b42;color:#b9aaff;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700}.hero h1{font-size:clamp(28px,6vw,48px);margin:12px 0 6px}.hero p{color:var(--muted);margin:0;line-height:1.5}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:18px}.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px}.full{grid-column:1/-1}label{display:block;font-size:13px;font-weight:700;margin-bottom:8px}textarea,input,select{width:100%;background:#0a0f1c;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:13px;font:inherit;outline:none}textarea:focus,input:focus,select:focus{border-color:var(--accent)}textarea{min-height:135px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.chips{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid var(--line);background:#0b101d;color:var(--muted);padding:9px 12px;border-radius:10px;cursor:pointer}.chip.active{background:#241d4b;color:white;border-color:var(--accent)}button{border:0;border-radius:12px;padding:12px 16px;font:inherit;font-weight:800;cursor:pointer}.primary{background:var(--accent);color:white}.secondary{background:#1c2538;color:white;border:1px solid var(--line)}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.timeline{display:grid;gap:10px}.scene{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:14px}.scene strong{color:#b9aaff}.scene .time{font-size:12px;color:var(--accent2);font-weight:800}.prompt{white-space:pre-wrap;line-height:1.6;background:#080d18;border:1px solid var(--line);border-radius:14px;padding:16px;min-height:250px}.small{font-size:12px;color:var(--muted)}.count{text-align:right;color:var(--muted);font-size:12px;margin-top:5px}@media(max-width:720px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.row{grid-template-columns:1fr}.app{padding:14px}}
-</style></head>
-<body><main class="app">
-<section class="hero"><span class="badge">PROMPTFORGE V2</span><h1>Text → 20s Video Prompt</h1><p>Turn a simple idea into a structured, cinematic prompt with a timed action sequence.</p></section>
-<div class="grid">
-<section class="card full"><label for="idea">Your video idea</label><textarea id="idea" maxlength="1200" placeholder="Example: A young African boy discovers a glowing ancient door in a forest at night."></textarea><div class="count"><span id="count">0</span>/1200</div></section>
-<section class="card"><label>Duration</label><div class="chips" id="durations"><button class="chip active" data-sec="20">20 sec</button><button class="chip" data-sec="15">15 sec</button><button class="chip" data-sec="10">10 sec</button><button class="chip" data-sec="5">5 sec</button></div></section>
-<section class="card"><label for="style">Visual style</label><select id="style"><option>Cinematic realistic</option><option>Hollywood action</option><option>Epic fantasy</option><option>African cinematic</option><option>Anime</option><option>3D animated film</option><option>Documentary</option><option>Music video</option></select></section>
-<section class="card"><label for="camera">Camera language</label><select id="camera"><option>Dynamic cinematic camera</option><option>Slow dolly and close-ups</option><option>Handheld realistic</option><option>Epic wide shots and crane moves</option><option>Fast action tracking</option><option>Dreamy floating camera</option></select></section>
-<section class="card"><label for="ratio">Aspect ratio</label><select id="ratio"><option>16:9 landscape</option><option>9:16 vertical</option><option>1:1 square</option><option>21:9 widescreen</option></select></section>
-<section class="card full"><label for="character">Character / continuity details (optional)</label><input id="character" maxlength="500" placeholder="Example: 18-year-old boy, short black hair, blue shirt, brown trousers; keep appearance identical throughout."></section>
-<section class="card full"><label for="dialogue">Dialogue / voice (optional)</label><input id="dialogue" maxlength="500" placeholder="Example: He whispers, “What is this place?” — natural Nigerian English accent. Leave blank for no dialogue."></section>
-<section class="card full"><label>Generate</label><div class="actions"><button class="primary" id="generate">✨ Generate Prompt</button><button class="secondary" id="copy">📋 Copy Prompt</button><button class="secondary" id="clear">Clear</button></div></section>
-<section class="card full"><label>Timed storyboard</label><div id="timeline" class="timeline"><div class="small">Your 20-second scene breakdown will appear here.</div></div></section>
-<section class="card full"><label>Final prompt</label><div id="output" class="prompt">Enter an idea and tap “Generate Prompt”.</div></section>
-</div></main>
-<script>
-const $=id=>document.getElementById(id);let duration=20;
-$('idea').addEventListener('input',()=>{$('count').textContent=$('idea').value.length});
-document.querySelectorAll('#durations .chip').forEach(b=>b.onclick=()=>{document.querySelectorAll('#durations .chip').forEach(x=>x.classList.remove('active'));b.classList.add('active');duration=+b.dataset.sec});
-function clean(s){return s.trim().replace(/\s+/g,' ')}
-function scenes(sec){if(sec===5)return [['0–2s','Establish the location and subject immediately with a strong visual hook.'],['2–4s','Show the main action clearly with purposeful camera movement.'],['4–5s','Finish on a memorable reaction or visual beat; clean cinematic ending.']];if(sec===10)return [['0–3s','Wide establishing shot introduces the world, subject, atmosphere, and visual hook.'],['3–6s','Move into the main action; reveal the important change or discovery.'],['6–8s','Increase intensity with a closer shot and a clear physical reaction.'],['8–10s','Resolve with a strong final image, reaction, or reveal; hold briefly at the end.']];if(sec===15)return [['0–4s','Establish the environment and subject with cinematic composition and immediate visual context.'],['4–8s','Begin the central action and progressively reveal what matters in the scene.'],['8–12s','Build the emotional or physical peak using closer framing and purposeful movement.'],['12–15s','Deliver the reveal or payoff, then end on a stable memorable frame.']];return [['0–5s','Opening wide/establishing shot: clearly establish location, time, subject, mood, and the visual hook.'],['5–10s','Medium/tracking shot: begin the main action and reveal the important development naturally.'],['10–15s','Close/impact shot: build to the emotional or physical peak, with realistic reactions and controlled camera motion.'],['15–20s','Final hero/reveal shot: resolve the action, hold the strongest image for a moment, and end cleanly without abrupt distortion.']];}
-function makePrompt(){const idea=clean($('idea').value);if(!idea){$('idea').focus();return}const style=$('style').value,cam=$('camera').value,ratio=$('ratio').value,char=clean($('character').value),dialogue=clean($('dialogue').value);const ss=scenes(duration);let timeline=ss.map(x=>`<div class="scene"><div class="time">${x[0]}</div><div>${x[1]}</div></div>`).join('');$('timeline').innerHTML=timeline;let timelineText=ss.map(x=>`${x[0]} — ${x[1]}`).join('\n');let p=`Create a ${duration}-second ${style} video in ${ratio}.\n\nCORE IDEA:\n${idea}\n\nCONTINUITY:\n${char||'Keep all characters, clothing, faces, props, environment, and spatial relationships visually consistent from beginning to end.'}\n\nTIMELINE:\n${timelineText}\n\nCAMERA:\n${cam}. Use intentional framing, natural depth of field, realistic motion blur, smooth transitions between shots, and physically believable camera movement.\n\nLIGHTING & ENVIRONMENT:\nUse cinematic lighting appropriate to the location and time of day. Preserve realistic textures, atmospheric depth, reflections, shadows, and consistent light direction throughout the shot.\n\nPERFORMANCE & MOTION:\nNatural human/creature movement, believable weight and physics, expressive facial reactions, accurate hand/object interaction, no frozen poses.\n\nDIALOGUE / AUDIO:\n${dialogue||'No spoken dialogue unless naturally required. Add realistic environmental ambience, synchronized sound effects, and subtle cinematic audio.'}\n\nQUALITY:\nHigh-detail cinematic image, coherent anatomy, stable identity, stable clothing and props, realistic materials, clean composition, smooth temporal consistency, professional film look.\n\nNEGATIVE PROMPT:\nAvoid flicker, frame jumps, identity changes, extra fingers or limbs, warped faces, duplicated people, floating objects, inconsistent clothing, broken anatomy, unnatural physics, unreadable text, sudden lighting changes, camera shake unless intentionally requested, and abrupt ending.`;$('output').textContent=p}
-$('generate').onclick=makePrompt;
-$('copy').onclick=async()=>{const text=$('output').textContent;if(!text||text.startsWith('Enter an idea'))return;try{await navigator.clipboard.writeText(text);$('copy').textContent='✓ Copied';setTimeout(()=>$('copy').textContent='📋 Copy Prompt',1500)}catch(e){alert('Copy failed. Long-press the prompt to copy it.')}};
-$('clear').onclick=()=>{$('idea').value='';$('count').textContent='0';$('character').value='';$('dialogue').value='';$('output').textContent='Enter an idea and tap “Generate Prompt”.';$('timeline').innerHTML='<div class="small">Your scene breakdown will appear here.</div>'};
-</script></body></html>
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>PromptForge V3 — AI Video Prompt Studio</title>
-<style>
-:root{--bg:#0b1020;--card:#121a2e;--card2:#18233b;--text:#f5f7ff;--muted:#9da9c7;--accent:#7c5cff;--accent2:#20d4a5;--line:#293653;--danger:#ff6b7a}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}button,input,textarea,select{font:inherit}button{cursor:pointer;border:0}.app{max-width:1100px;margin:auto;padding:22px}.hero{padding:10px 0 20px}.badge{display:inline-block;padding:6px 10px;border:1px solid var(--line);border-radius:999px;color:#b9c3ff;font-size:12px}.hero h1{font-size:clamp(28px,6vw,46px);margin:12px 0 8px}.hero p{color:var(--muted);margin:0}.grid{display:grid;grid-template-columns:360px 1fr;gap:18px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}.card h2{font-size:18px;margin:0 0 14px}.field{margin:0 0 14px}.field label{display:block;font-size:13px;color:#cbd3e9;margin-bottom:7px}.field input,.field textarea,.field select{width:100%;background:#0d1528;color:var(--text);border:1px solid var(--line);border-radius:12px;padding:11px;outline:none}.field textarea{min-height:150px;resize:vertical}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.checks{display:grid;gap:8px}.check{display:flex;gap:8px;align-items:center;color:#cbd3e9;font-size:13px}.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.btn{padding:11px 14px;border-radius:11px;background:var(--card2);color:var(--text);border:1px solid var(--line)}.primary{background:var(--accent);border-color:var(--accent);font-weight:700}.green{background:var(--accent2);color:#06130f;border-color:var(--accent2);font-weight:700}.danger{color:#ffd2d8}.small{font-size:12px;color:var(--muted)}.scene{border:1px solid var(--line);background:#0e172b;border-radius:16px;padding:16px;margin-bottom:12px}.sceneHead{display:flex;justify-content:space-between;gap:10px;align-items:center}.sceneHead h3{margin:0;font-size:17px}.pill{font-size:11px;color:#c9d0ff;border:1px solid var(--line);border-radius:999px;padding:5px 8px}.scene textarea{min-height:260px;margin-top:12px}.copyScene{margin-top:8px}.empty{padding:35px 15px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:14px}.characterBox{background:#0d1528;border:1px solid var(--line);padding:12px;border-radius:12px;color:#cbd3e9;font-size:13px;line-height:1.5;white-space:pre-wrap}.footer{padding:18px 0;color:var(--muted);font-size:12px;text-align:center}@media(max-width:800px){.grid{grid-template-columns:1fr}.app{padding:14px}.row{grid-template-columns:1fr}}
-</style></head>
-<body><main class="app">
-<section class="hero"><span class="badge">PROMPTFORGE V3</span><h1>Story → Connected AI Video Prompts</h1><p>Turn one story idea into multiple connected scenes, each designed for up to 20 seconds.</p></section>
-<div class="grid">
 <section class="card">
-<h2>Story setup</h2>
-<div class="field"><label>Story / idea</label><textarea id="story" placeholder="Example: A poor African boy discovers a mysterious glowing stone in a forest and follows its light to an ancient hidden city."></textarea></div>
-<div class="row"><div class="field"><label>Scenes</label><select id="sceneCount"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>8</option><option>10</option></select></div><div class="field"><label>Seconds / scene</label><select id="duration"><option>5</option><option>10</option><option>15</option><option selected>20</option></select></div></div>
-<div class="row"><div class="field"><label>Visual style</label><select id="style"><option>Cinematic realistic</option><option>Hollywood fantasy</option><option>African cinematic drama</option><option>Epic biblical</option><option>Anime</option><option>3D animation</option><option>Documentary</option></select></div><div class="field"><label>Aspect ratio</label><select id="ratio"><option>16:9</option><option>9:16</option><option>1:1</option></select></div></div>
-<div class="field"><label>Character / continuity description (optional)</label><textarea id="character" style="min-height:95px" placeholder="Example: 12-year-old African boy, slim build, short black hair, blue faded shirt, brown shorts, worn sandals. Keep identical in every scene."></textarea></div>
-<div class="checks"><label class="check"><input id="dialogue" type="checkbox" checked> Include dialogue / voice guidance</label><label class="check"><input id="sound" type="checkbox" checked> Include sound design</label><label class="check"><input id="negative" type="checkbox" checked> Include negative prompt</label></div>
-<div class="actions"><button class="btn primary" id="generate">Generate Story</button><button class="btn" id="clear">Clear</button></div>
+  <label for="idea">Your video idea</label>
+  <textarea id="idea" maxlength="1200" placeholder="Example: A young African boy walks through a mysterious forest and discovers a glowing blue stone."></textarea>
+  <div class="counter"><span id="count">0</span>/1200</div>
 </section>
-<section class="card"><div class="sceneHead"><h2>Generated scenes</h2><div class="actions" style="margin:0"><button class="btn green" id="copyAll">Copy All</button></div></div><div id="characterOut" style="display:none;margin:10px 0 14px"><div class="small">CONTINUITY LOCK</div><div class="characterBox" id="characterText"></div></div><div id="scenes"><div class="empty">Enter a story idea and tap <b>Generate Story</b>.</div></div></section>
-</div><div class="footer">PromptForge generates structured prompts locally. It does not call a video-generation API.</div>
+
+<section class="card">
+  <label>Duration</label>
+  <div class="duration">
+    <button data-duration="20" class="active">20 sec</button>
+    <button data-duration="15">15 sec</button>
+    <button data-duration="10">10 sec</button>
+    <button data-duration="5">5 sec</button>
+  </div>
+</section>
+
+<section class="card">
+  <div class="grid">
+    <div>
+      <label for="style">Visual style</label>
+      <select id="style">
+        <option>Cinematic realistic</option>
+        <option>Hollywood cinematic</option>
+        <option>African film realism</option>
+        <option>Fantasy realism</option>
+        <option>Anime cinematic</option>
+        <option>3D animated film</option>
+        <option>Documentary realism</option>
+      </select>
+    </div>
+    <div>
+      <label for="camera">Camera language</label>
+      <select id="camera">
+        <option>Dynamic cinematic camera</option>
+        <option>Slow cinematic camera</option>
+        <option>Handheld documentary camera</option>
+        <option>Epic sweeping camera</option>
+        <option>Intimate character-focused camera</option>
+      </select>
+    </div>
+    <div>
+      <label for="aspect">Aspect ratio</label>
+      <select id="aspect">
+        <option>16:9 landscape</option>
+        <option>9:16 vertical</option>
+        <option>1:1 square</option>
+      </select>
+    </div>
+    <div>
+      <label for="continuity">Character / continuity details</label>
+      <input id="continuity" placeholder="Age, clothing, hair, important props...">
+    </div>
+  </div>
+</section>
+
+<section class="card">
+  <label for="dialogue">Dialogue / voice (optional)</label>
+  <input id="dialogue" placeholder='Example: He whispers, "What is this?" — natural Nigerian English.'>
+  <div class="actions">
+    <button class="action primary" id="generate">✨ Generate V4 Prompt</button>
+    <button class="action secondary" id="copy">📋 Copy All</button>
+    <button class="action secondary" id="clear">Clear</button>
+  </div>
+  <div class="status" id="status"></div>
+</section>
+
+<section class="card">
+  <h2>Story-driven timeline</h2>
+  <div class="small">Unlike the earlier version, each time block describes concrete events from your actual idea rather than generic shot instructions.</div>
+  <div class="timeline" id="timeline"></div>
+</section>
+
+<section class="card">
+  <h2>Final prompt</h2>
+  <div class="prompt" id="output">Your generated prompt will appear here.</div>
+</section>
 </main>
+
 <script>
 const $=id=>document.getElementById(id);
-function clean(s){return s.trim().replace(/\s+/g,' ')}
-function inferCharacter(story){const m=story.match(/(?:a|an|the)\s+([^,.!?]{5,100})(?:\s+(?:discovers|finds|sees|walks|runs|enters|meets|is|goes|travels))/i);return m?`Main subject inferred from story: ${m[1]}. Preserve the same age, face, body proportions, hairstyle, clothing, colors and accessories across every scene.`:'Keep every recurring character visually identical across scenes: same face, age, body proportions, hairstyle, clothing, colors and accessories.'}
-function buildScene(story,n,total,dur,style,ratio,char,dialogue,sound,negative){
- const beats=dur==20?`0–5s: establish the location and character; 5–10s: begin the main action; 10–15s: intensify the action or reveal; 15–20s: deliver a clear visual payoff and transition-ready ending.`:dur==15?`0–5s: establish; 5–10s: main action; 10–15s: reveal/payoff.`:dur==10?`0–4s: establish; 4–7s: action; 7–10s: payoff.`:`0–2s: establish; 2–4s: action; 4–5s: payoff.`;
- const arc=[`Opening / setup`,`Inciting action`,`Rising action`,`Turning point`,`Climax`,`Resolution`,`Aftermath`,`Final reveal`][(n-1)%8];
- const camera=['wide establishing shot, slow cinematic push-in','medium tracking shot following the subject','low-angle dolly movement that builds scale','handheld close-up with controlled cinematic motion','over-the-shoulder shot revealing the discovery','slow orbit around the subject as the moment peaks','aerial-to-ground transition ending on the subject','close-up reaction followed by a gentle pull-back'][n-1%8];
- const action=n===1?`Open naturally from the story premise: ${story}`:`Continue directly from the previous scene. Advance the story rather than restarting it. Scene ${n} should represent the ${arc.toLowerCase()} of the narrative.`;
- return `SCENE ${n} OF ${total} — ${dur} SECONDS
-TITLE: ${arc}
+let duration=20;
+let lastPrompt="";
 
-CORE ACTION
-${action}
+$("idea").addEventListener("input",()=>{$("count").textContent=$("idea").value.length});
+document.querySelectorAll("[data-duration]").forEach(b=>{
+  b.onclick=()=>{
+    duration=Number(b.dataset.duration);
+    document.querySelectorAll("[data-duration]").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");
+    if($("idea").value.trim()) generate();
+  };
+});
 
-CHARACTER CONTINUITY
-${char}
-
-TIMELINE
-${beats}
-
-VISUAL STYLE
-${style}. ${ratio} composition. Photorealistic detail where appropriate, coherent geography, natural motion, physically believable lighting, consistent wardrobe and props.
-
-CAMERA
-${camera}. Smooth purposeful camera movement; keep the main subject readable and avoid random cuts.
-
-ENVIRONMENT & LIGHTING
-Build the location implied by the story with detailed textures, atmospheric depth, motivated light, realistic shadows and cinematic contrast. Maintain continuity with previous scenes.
-
-PERFORMANCE & MOTION
-Natural facial expressions, body movement and interaction with the environment. Every action must progress logically from the preceding moment and finish in a state that can connect to the next scene.${dialogue?'
-
-DIALOGUE / VOICE
-Use concise natural dialogue only when it advances the story. Keep lip movement synchronized. If no dialogue is needed, use expressive reactions and environmental sound instead.':''}${sound?'
-
-SOUND DESIGN
-Layer location ambience, footsteps and relevant environmental effects. Add restrained cinematic music that supports the emotional beat without overpowering dialogue.':''}
-
-CONTINUITY NOTE
-This is part of one continuous film. Do not change the character identity, clothing, props, location geography, time-of-day logic or visual style without a story reason. Match the final frame to the next scene.
-${negative?'
-NEGATIVE PROMPT
-No character identity drift, no wardrobe changes without cause, no extra fingers or limbs, no distorted faces, no warped objects, no unreadable text, no random camera jumps, no flicker, no inconsistent lighting, no sudden location changes, no low-detail faces, no unnatural motion.':''}`;
+function clean(s){return s.replace(/\s+/g," ").trim();}
+function firstPersonSubject(text){
+  const m=text.match(/\b(a|an|the)\s+([a-z0-9][^,.!?;]*)/i);
+  return m ? m[0] : "the main subject";
 }
-function generate(){const story=clean($('story').value);if(!story){$('story').focus();alert('Enter a story or video idea first.');return}const total=+$('sceneCount').value,dur=+$('duration').value,style=$('style').value,ratio=$('ratio').value;let char=clean($('character').value)||inferCharacter(story);$('characterOut').style.display='block';$('characterText').textContent=char;let out='';for(let i=1;i<=total;i++){const prompt=buildScene(story,i,total,dur,style,ratio,char,$('dialogue').checked,$('sound').checked,$('negative').checked);out+=`<article class="scene"><div class="sceneHead"><h3>Scene ${i}</h3><span class="pill">${dur}s • ${ratio}</span></div><textarea readonly>${prompt}</textarea><button class="btn copyScene" data-index="${i}">Copy Scene ${i}</button></article>`}$('scenes').innerHTML=out;document.querySelectorAll('.copyScene').forEach(b=>b.onclick=()=>navigator.clipboard.writeText(b.parentElement.querySelector('textarea').value).then(()=>{b.textContent='Copied ✓';setTimeout(()=>b.textContent='Copy Scene '+b.dataset.index,1200)}));}
-$('generate').onclick=generate;$('clear').onclick=()=>{['story','character'].forEach(x=>$(x).value='');$('characterOut').style.display='none';$('scenes').innerHTML='<div class="empty">Enter a story idea and tap <b>Generate Story</b>.</div>'};$('copyAll').onclick=()=>{const ts=[...document.querySelectorAll('.scene textarea')];if(!ts.length)return; navigator.clipboard.writeText(ts.map(x=>x.value).join('
+function extractSentences(text){
+  return text.split(/(?<=[.!?])\s+|[\n]+/).map(clean).filter(Boolean);
+}
+function extractActions(text){
+  const verbs=[
+    "walk","run","enter","leave","find","discover","see","look","watch","hold","pick",
+    "touch","open","close","fight","chase","follow","turn","stop","sit","stand","fall",
+    "rise","reach","grab","carry","push","pull","jump","hide","speak","whisper","shout",
+    "smile","cry","laugh","attack","escape","arrive","search","explore","approach",
+    "kneel","lift","throw","look","notice","reveals","revealed","discovers","walks",
+    "runs","enters","finds","sees","holds","picks","touches","opens","closes","fights",
+    "chases","follows","stops","stands","falls","reaches","grabs","carries","pushes",
+    "pulls","jumps","hides","speaks","whispers","shouts","smiles","cries","escapes",
+    "arrives","searches","explores","approaches","kneels","lifts","throws","notices"
+  ];
+  const found=[];
+  const lower=text.toLowerCase();
+  verbs.forEach(v=>{
+    if(lower.includes(v) && !found.includes(v)) found.push(v);
+  });
+  return found;
+}
 
-==============================
+function buildEvents(idea,n){
+  const text=clean(idea);
+  const subject=firstPersonSubject(text);
+  const sentences=extractSentences(text);
+  const actions=extractActions(text);
+  const events=[];
+  const segments={
+    5:[
+      `Show ${subject} performing the central action described in the idea: ${text}.`,
+    ],
+    10:[
+      `Establish ${subject} and the setting, then show the first concrete action from the story: ${text}.`,
+      `Continue directly into the discovery, interaction, or consequence described by the story: ${text}.`
+    ],
+    15:[
+      `Establish ${subject} in the exact environment implied by the story, then begin the first action: ${text}.`,
+      `Develop the story's central action. Show ${subject} reacting naturally to the important change or discovery in the idea.`,
+      `Build toward the story's key moment, clearly showing the object, person, place, or event that matters most.`
+    ],
+    20:[
+      `Establish ${subject} and the environment. Show the opening action explicitly: ${text}.`,
+      `Continue the exact story rather than introducing a new plot. Show ${subject} moving, looking, reacting, or interacting according to the idea. ${sentences[0]||text}`,
+      `Show the central development or discovery described by the user. Make the important object, person, or event clearly visible and physically connected to the character.`,
+      `Resolve the action with a strong final image directly related to the story. Preserve the character, environment, important prop, and spatial continuity.`
+    ]
+  };
+  const base=segments[n];
+  for(let i=0;i<n;i++) events.push(base[i]||base[base.length-1]);
+  // More specific replacements for common discovery pattern
+  if(n===4 && /discover|find|found|finds|discovers|glow|stone|treasure|secret/i.test(text)){
+    events[0]=`Wide establishing view of ${subject} moving through the environment described in the story. Show the setting clearly and begin the character's journey.`;
+    events[1]=`${subject} continues forward and notices a specific unusual clue connected to the discovery in the story. Make the clue visible in the environment and show the character noticing it.`;
+    events[2]=`${subject} approaches the discovery and physically interacts with it. Clearly reveal the important object or phenomenon described in the idea, with a believable facial reaction.`;
+    events[3]=`${subject} completes the discovery moment. Hold on the important object and the character's reaction, ending on a visually memorable image without changing the story.`;
+  }
+  return events;
+}
 
-')).then(()=>alert('All scene prompts copied.'))};
-</script></body></html>
+function shotFor(i,n){
+  const shots=["wide establishing shot","medium tracking shot","close-up reaction shot","hero reveal shot"];
+  if(n===1)return "single continuous cinematic shot";
+  if(n===2)return i===0?"wide-to-medium establishing movement":"medium-to-close reveal movement";
+  if(n===3)return ["wide establishing shot","medium tracking/reaction shot","close-up hero reveal shot"][i];
+  return shots[Math.min(i,3)];
+}
+function timelineText(events){
+  const block=duration/events.length;
+  return events.map((e,i)=>{
+    const a=Math.round(i*block), b=Math.round((i+1)*block);
+    return {start:a,end:b,text:e};
+  });
+}
+function generate(){
+  const idea=clean($("idea").value);
+  if(!idea){$("status").textContent="Enter a video idea first.";return;}
+  const style=$("style").value,camera=$("camera").value,aspect=$("aspect").value;
+  const continuity=clean($("continuity").value);
+  const dialogue=clean($("dialogue").value);
+  const n=duration<=5?1:duration<=10?2:duration<=15?3:4;
+  const events=buildEvents(idea,n);
+  const timed=timelineText(events);
+
+  $("timeline").innerHTML=timed.map((x,i)=>`
+    <article class="scene">
+      <div class="scene-head"><strong>${x.start}–${x.end}s</strong><span class="badge">${shotFor(i,n)}</span></div>
+      <p>${x.text}</p>
+    </article>`).join("");
+
+  const timeline=timed.map((x,i)=>
+`${x.start}–${x.end}s — ${x.text}
+CAMERA: ${shotFor(i,n)} using ${camera}; physically believable movement, purposeful framing, natural depth of field.`).join("\n\n");
+
+  lastPrompt=`Create a ${duration}-second ${style} video in ${aspect}.
+
+CORE STORY:
+${idea}
+
+STORY EXECUTION:
+Do not replace the user's story with generic filmmaking instructions. Visually depict the concrete events in the story in the order described. Do not invent unrelated characters, locations, objects, or plot developments.
+
+CHARACTER / CONTINUITY:
+${continuity||"Define the main character from the story consistently: same face, age, skin tone, hairstyle, clothing, body proportions and accessories throughout the video."}
+Keep important props, locations, lighting direction and spatial relationships consistent.
+
+TIMED ACTION SEQUENCE:
+${timeline}
+
+LIGHTING & ENVIRONMENT:
+Use an environment that directly matches the story. Maintain consistent time of day, weather, shadows, color temperature, textures and atmospheric depth. If the story contains a special visual element, make it physically interact with the environment.
+
+PERFORMANCE & PHYSICS:
+Show clear cause-and-effect action. Characters must move naturally with believable weight, balance, hand/object contact and facial reactions. Objects must remain solid and spatially consistent.
+
+DIALOGUE / AUDIO:
+${dialogue||"No spoken dialogue unless the story naturally requires it. Add realistic environmental ambience and synchronized sound effects that correspond to the visible actions."}
+
+CINEMATOGRAPHY:
+${camera}. Use motivated camera movement that supports the action. Do not let camera effects hide important story events. Use smooth transitions and physically believable motion.
+
+QUALITY:
+High-detail ${style} image, coherent anatomy, stable identity, stable clothing and props, realistic materials, temporal consistency, clean composition, professional film look.
+
+NEGATIVE PROMPT:
+Do not add unrelated plot events. Avoid flicker, frame jumps, identity changes, extra fingers or limbs, warped faces, duplicated people, floating objects, inconsistent clothing, broken anatomy, impossible physics, sudden location changes, unexplained props, random text, abrupt lighting changes, excessive camera shake, or an ending unrelated to the user's story.`;
+
+  $("output").textContent=lastPrompt;
+  $("status").textContent="✓ Story-specific prompt generated.";
+}
+$("generate").onclick=generate;
+$("copy").onclick=async()=>{
+  if(!lastPrompt){generate(); if(!lastPrompt)return;}
+  try{await navigator.clipboard.writeText(lastPrompt);$("status").textContent="✓ Prompt copied to clipboard."}
+  catch(e){$("status").textContent="Select and copy the prompt manually."}
+};
+$("clear").onclick=()=>{
+  $("idea").value="";$("count").textContent="0";$("continuity").value="";$("dialogue").value="";
+  $("timeline").innerHTML="";$("output").textContent="Your generated prompt will appear here.";lastPrompt="";$("status").textContent="";
+};
+</script>
+</body>
+ </html>
