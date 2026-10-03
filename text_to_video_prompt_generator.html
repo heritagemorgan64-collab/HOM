@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PromptForge — Text to Video Prompt</title>
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#f5f7fb,#090d14);--panel:light-dark(#fff,#111722);--panel2:light-dark(#f0f3f8,#171e2b);--text:light-dark(#111827,#f3f6fb);--muted:light-dark(#667085,#9aa7b8);--line:light-dark(#dce2ea,#273244);--accent:light-dark(#5b45e6,#8b7cff);--accent2:light-dark(#7c3aed,#a78bfa)}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text)}#app{min-height:100vh;background:var(--bg);padding:28px 16px 40px}.wrap{max-width:850px;margin:auto}.brand{display:flex;align-items:center;gap:12px;margin-bottom:22px}.logo{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;font-weight:900;font-size:21px}.brand h1{font-size:22px;margin:0}.brand p{margin:3px 0 0;color:var(--muted);font-size:13px}.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px;margin-bottom:16px;box-shadow:0 10px 30px #0000000b}.label{font-weight:750;font-size:14px;margin-bottom:9px;display:block}.hint{font-size:12px;color:var(--muted);margin:7px 0 0}textarea{width:100%;min-height:145px;resize:vertical;border:1px solid var(--line);border-radius:14px;background:var(--panel2);color:var(--text);padding:15px;font:inherit;outline:none}textarea:focus{border-color:var(--accent)}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.select{width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--text);font:inherit}.checks{display:flex;flex-wrap:wrap;gap:9px;margin-top:14px}.chip{border:1px solid var(--line);border-radius:999px;padding:9px 12px;cursor:pointer;font-size:13px;user-select:none}.chip input{accent-color:var(--accent);margin-right:6px}.actions{display:flex;gap:10px;margin-top:16px}.btn{border:0;border-radius:12px;padding:12px 17px;font:700 14px inherit;cursor:pointer}.primary{background:var(--accent);color:#fff;flex:1}.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}.output{white-space:pre-wrap;line-height:1.65;font-size:14px;min-height:190px;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:16px}.outhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.badge{font-size:11px;border-radius:999px;padding:5px 8px;background:#5b45e61a;color:var(--accent)}.empty{color:var(--muted);font-style:italic}.footer{text-align:center;color:var(--muted);font-size:11px;margin-top:18px}@media(max-width:600px){#app{padding:20px 12px 30px}.card{padding:15px;border-radius:16px}.row{grid-template-columns:1fr}.actions{flex-direction:column}.primary{width:100%}}
+</style>
+</head>
+<body>
+<div id="app"><div class="wrap">
+  <div class="brand"><div class="logo">P</div><div><h1>PromptForge</h1><p>Turn an idea into a detailed video-generation prompt</p></div></div>
+  <section class="card">
+    <label class="label" for="idea">Describe your video</label>
+    <textarea id="idea" placeholder="Example: David fights Goliath on an ancient battlefield at sunrise. David is small but brave, Goliath is huge and intimidating."></textarea>
+    <p class="hint">The more detail you provide, the more specific the generated prompt will be.</p>
+    <div class="row">
+      <div><label class="label" for="duration">Duration</label><select class="select" id="duration"><option value="5">5 seconds</option><option value="10">10 seconds</option><option value="15">15 seconds</option><option value="20" selected>20 seconds</option></select></div>
+      <div><label class="label" for="style">Visual style</label><select class="select" id="style"><option>Cinematic</option><option>Photorealistic</option><option>Epic fantasy</option><option>Documentary</option><option>Anime</option><option>3D animation</option><option>Music video</option></select></div>
+    </div>
+    <div class="checks">
+      <label class="chip"><input type="checkbox" id="camera" checked> Camera movement</label>
+      <label class="chip"><input type="checkbox" id="lighting" checked> Lighting</label>
+      <label class="chip"><input type="checkbox" id="sound" checked> Sound design</label>
+      <label class="chip"><input type="checkbox" id="negative" checked> Negative prompt</label>
+    </div>
+    <div class="actions"><button class="btn primary" id="generate">✨ Generate Prompt</button><button class="btn secondary" id="clear">Clear</button></div>
+  </section>
+  <section class="card">
+    <div class="outhead"><span class="label" style="margin:0">Generated prompt</span><span class="badge" id="status">Ready</span></div>
+    <div id="output" class="output"><span class="empty">Your generated prompt will appear here.</span></div>
+    <div class="actions"><button class="btn secondary" id="copy">📋 Copy Prompt</button></div>
+  </section>
+  <div class="footer">PromptForge • runs locally in your browser • no API key required</div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);
+function sentence(s){return s.trim().replace(/\s+/g,' ').replace(/[.!?]+$/,'')+'.'}
+function makePrompt(){
+ const idea=$('idea').value.trim(); if(!idea){$('output').innerHTML='<span class="empty">Enter an idea first.</span>';return;}
+ const d=$('duration').value, style=$('style').value, camera=$('camera').checked, lighting=$('lighting').checked, sound=$('sound').checked, negative=$('negative').checked;
+ const cams=['slow cinematic push-in toward the main subject','smooth low-angle tracking shot that follows the action','wide establishing shot that gently moves into a medium shot','dynamic handheld-style movement with controlled cinematic stabilization'];
+ const lights=['soft golden-hour light with natural volumetric rays','dramatic directional lighting with realistic shadows','moody atmospheric lighting with subtle highlights and depth','bright natural daylight with cinematic contrast'];
+ const cam=cams[Math.floor(Math.random()*cams.length)], light=lights[Math.floor(Math.random()*lights.length)];
+ let p=`Create a ${d}-second ${style.toLowerCase()} video.\n\nSCENE: ${sentence(idea)}\n\nACTION & CONTINUITY: Begin with the environment clearly established, then let the main action develop naturally and continuously. Keep characters, clothing, faces, objects and locations consistent from beginning to end. Use believable physical movement and realistic interaction with the environment. End with a clear cinematic final moment rather than an abrupt cut.`;
+ if(camera)p+=`\n\nCAMERA: ${cam}. Use natural depth of field, deliberate framing and smooth motion. Keep the main subject readable throughout the shot.`;
+ if(lighting)p+=`\n\nLIGHTING: ${light}. Preserve realistic skin/material texture, shadows and highlights; avoid flickering exposure.`;
+ p+=`\n\nVISUAL QUALITY: High detail, coherent composition, natural motion, realistic textures, polished professional cinematography, consistent proportions, no distracting visual artifacts.`;
+ if(sound)p+=`\n\nSOUND: Add synchronized environmental ambience and subtle sound effects that match the action. If appropriate, include restrained cinematic music underneath without overpowering dialogue or important sounds.`;
+ if(negative)p+=`\n\nAVOID: text overlays, subtitles, watermarks, logos, distorted faces, extra fingers or limbs, duplicate people, warped objects, sudden costume changes, inconsistent backgrounds, unnatural motion, jitter, flicker, oversharpening, low-resolution details.`;
+ $('output').textContent=p; $('status').textContent='Generated';
+}
+$('generate').onclick=makePrompt;
+$('clear').onclick=()=>{$('idea').value='';$('output').innerHTML='<span class="empty">Your generated prompt will appear here.</span>';$('status').textContent='Ready'};
+$('copy').onclick=async()=>{const t=$('output').innerText;if(!t||t.includes('Your generated'))return;try{await navigator.clipboard.writeText(t);$('status').textContent='Copied!';setTimeout(()=>$('status').textContent='Generated',1200)}catch(e){$('status').textContent='Select and copy manually'}};
+$('idea').addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter')makePrompt()});
+</script>
+</body></html>
