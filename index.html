@@ -39,7 +39,7 @@ video{width:100%;margin-top:10px;border-radius:14px;background:#000}.actions{dis
 <div class="actions"><a id="download" class="secondary" download="promptforge-video.mp4">SAVE VIDEO</a><button id="new" class="secondary">NEW VIDEO</button></div></div>
 </div>
 <script>
-const BACKEND_URL="PASTE_YOUR_BACKEND_URL_HERE";
+const BACKEND_URL="https://promptforge-v7-backend.onrender.com";
 const $=id=>document.getElementById(id);
 $("generate").onclick=async()=>{
  const story=$("story").value.trim(); if(!story){$("status").innerHTML='<span class="error">Enter your story first.</span>';return}
